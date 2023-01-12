@@ -1,0 +1,5 @@
+This is the Github repo created by Bruce Qu.
+
+Class name: ECE 180DA
+
+Discussion Task II
