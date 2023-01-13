@@ -49,5 +49,3 @@ def bounding_rect(imgray):
     box = np.int0(box)
     cv.drawContours(imgray, [box], -1, (0,255,0), 3)
     cv.imshow("Grayscale Image", imgray)
-    cv.waitKey(0)
-
