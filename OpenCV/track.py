@@ -25,20 +25,39 @@ while(1):
 cv.destroyAllWindows()
 
 # Display an example image
-# helpers.display(0, "/Users/brucequ/Documents/180DA-WarmUp/test_image.jpeg")
+helpers.display(0, "/Users/brucequ/Documents/180DA-WarmUp/Images/test_image.jpeg")
 
-img = cv.imread("/Users/brucequ/Documents/180DA-WarmUp/test_image.jpeg", -1)
-imgray = cv.imread("/Users/brucequ/Documents/180DA-WarmUp/test_image.jpeg", 0)
-result = helpers.adaptive_threshold(imgray)
-result = helpers.Otsu_Gaussian(imgray)
-ret, thresh = cv.threshold(imgray, 127, 255, 0)
-contours, hierarchy = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-cv.drawContours(img, contours, -1, (0,255,0), 3)
 
-# Display adaptive threshold
-while(1):
-    cv.imshow("Adaptive_threshold", result)
-    k = cv.waitKey(5) & 0xFF
-    if k == 27:
-        break
-cv.destroyAllWindows()
+
+######################################
+## Testing functions in helper.py
+######################################
+
+img = cv.imread("/Users/brucequ/Documents/180DA-WarmUp/Images/test_image2.jpeg", -1)
+imgray = cv.imread("/Users/brucequ/Documents/180DA-WarmUp/Images/test_image2.jpeg", 0)
+# result = helpers.adaptive_threshold(imgray)
+# result = helpers.Otsu_Gaussian(imgray)
+# ret, thresh = cv.threshold(imgray, 127, 255, 0)
+# contours, hierarchy = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+# cv.drawContours(img, contours, -1, (0,255,0), 3)
+
+# # Display OTSU threshold
+# while(1):
+#     cv.imshow("Adaptive_threshold", result)
+#     k = cv.waitKey(5) & 0xFF
+#     if k == 27:
+#         break
+# cv.destroyAllWindows()
+
+# # Canny Edge Detection
+# edges = cv.Canny(imgray, 100, 200)
+# plt.subplot(121), plt.imshow(imgray, cmap='gray')
+# plt.title("Original Image"), plt.xticks([]), plt.yticks([])
+
+# plt.subplot(122), plt.imshow(edges, cmap='gray')
+# plt.title("Edge Image"), plt.xticks([]), plt.yticks([])
+
+# plt.show()
+
+# Bounding Rectangles
+helpers.bounding_rect(imgray)
