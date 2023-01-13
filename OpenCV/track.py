@@ -23,4 +23,4 @@ import helpers
 #         break
 # cv.destroyAllWindows()
 
-helpers.display("/Users/brucequ/Documents/180DA-WarmUp/test_image.jpeg")
+helpers.display("/Users/brucequ/Documents/180DA-WarmUp/test_image.jpeg", 0)
