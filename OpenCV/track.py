@@ -23,7 +23,7 @@ while True:
     contours, _ = cv.findContours(thresh, 1, 2)
     for contour in contours:
         (x, y, w, h) = cv.boundingRect(contour)
-        if cv.contourArea(contour) < 1000:
+        if cv.contourArea(contour) < 1100:
             continue
         cv.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), 2)
         cv.putText(frame, "Status: {}".format('Movement'), (10, 20), cv.FONT_HERSHEY_SIMPLEX, \
