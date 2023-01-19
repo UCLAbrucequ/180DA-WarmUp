@@ -51,4 +51,15 @@ def bounding_rect(imgray):
     cv.imshow("Grayscale Image", imgray)
 
 
+def colorMask(color):
+    """
+    Returns a color mask
+    INPUT:
+        - color: name of the color
+    OUTPUT:
+        - color mask
+    """
+    
+
+
     

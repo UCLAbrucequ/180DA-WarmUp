@@ -13,13 +13,21 @@ while True:
     # define range of blue color in HSV
     lower_blue = np.array([110,50,50])
     upper_blue = np.array([130,255,255])
+
+    lower_green = np.array([30,20,20])
+    upper_green = np.array([80,255,255])
     
     # mask of blue
-    mask1 = cv.inRange (hsv, lower_blue, upper_blue)
+    mask1 = cv.inRange(hsv, lower_blue, upper_blue)
 
-    res = cv.bitwise_and(frame, frame, mask=mask1)
+    # mask of green
+    mask2 = cv.inRange(hsv, lower_green, upper_green)
 
-    ret, thresh = cv.threshold(mask1.copy(), 127, 255, 0)
+    mask_merge = cv.bitwise_or(mask1, mask2)
+
+    res = cv.bitwise_and(frame, frame, mask=mask_merge)
+
+    ret, thresh = cv.threshold(mask_merge.copy(), 127, 255, 0)
     contours, _ = cv.findContours(thresh, 1, 2)
     for contour in contours:
         (x, y, w, h) = cv.boundingRect(contour)
