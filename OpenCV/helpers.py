@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 from matplotlib import pyplot as plt
+from sklearn.cluster import KMeans
 
 def display(flag, path=None):
     """
@@ -51,15 +52,46 @@ def bounding_rect(imgray):
     cv.imshow("Grayscale Image", imgray)
 
 
-def colorMask(color):
+def find_histogram(clt):
     """
-    Returns a color mask
-    INPUT:
-        - color: name of the color
-    OUTPUT:
-        - color mask
+    create a histogram with k clusters
+    :param: clt
+    :return:hist
     """
-    
+    numLabels = np.arange(0, len(np.unique(clt.labels_)) + 1)
+    (hist, _) = np.histogram(clt.labels_, bins=numLabels)
+
+    hist = hist.astype("float")
+    hist /= hist.sum()
+
+    return hist
 
 
-    
+def plot_colors2(hist, centroids):
+    bar = np.zeros((50, 300, 3), dtype="uint8")
+    startX = 0
+
+    for (percent, color) in zip(hist, centroids):
+        # plot the relative percentage of each cluster
+        endX = startX + (percent * 300)
+        cv.rectangle(bar, (int(startX), 0), (int(endX), 50),
+                      color.astype("uint8").tolist(), -1)
+        startX = endX
+
+    # return the bar chart
+    return bar
+
+
+def find_dominant_color(frame):
+    # Convert BGR to RGB
+    rgb = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+    rgb = rgb.reshape((rgb.shape[0] * rgb.shape[1],3))
+    clt = KMeans(n_clusters=3) #cluster number
+    clt.fit(rgb)
+
+    hist = find_histogram(clt)
+    bar = plot_colors2(hist, clt.cluster_centers_)
+
+    plt.axis("off")
+    plt.imshow(bar)
+    plt.show()

@@ -4,12 +4,18 @@ from matplotlib import pyplot as plt
 import helpers
 
 
+
 cap = cv.VideoCapture(0)
 
 while True:
     _, frame = cap.read()
+
+    # Draw a rectangle in the middle of the frame
+    cv.rectangle(frame, (490, 110), (490+300, 110+500), (255,0,0), 2)
+
     # Convert BGR to HSV
     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+
     # define range of blue color in HSV
     lower_blue = np.array([110,50,50])
     upper_blue = np.array([130,255,255])
@@ -23,12 +29,12 @@ while True:
     # mask of green
     mask2 = cv.inRange(hsv, lower_green, upper_green)
 
+    # combined mask
     mask_merge = cv.bitwise_or(mask1, mask2)
-
-    res = cv.bitwise_and(frame, frame, mask=mask_merge)
 
     ret, thresh = cv.threshold(mask_merge.copy(), 127, 255, 0)
     contours, _ = cv.findContours(thresh, 1, 2)
+
     for contour in contours:
         (x, y, w, h) = cv.boundingRect(contour)
         if cv.contourArea(contour) < 1100:
@@ -39,9 +45,11 @@ while True:
 
     cv.imshow('frame',frame)
 
-    k = cv.waitKey(5) 
-    if k == 27:
+    k = cv.waitKey(5)
+    if k == ord("q"):
         break
+    if cv.waitKey(5) == ord("a"):
+        helpers.find_dominant_color(frame[110:610, 490:790, :])
 
 cv.destroyAllWindows()
 cap.release()
