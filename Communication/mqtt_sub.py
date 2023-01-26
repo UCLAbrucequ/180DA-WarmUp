@@ -8,7 +8,7 @@ def on_connect(client, userdata, flags, rc):
 
   # Subscribing in on_connect() means that if we lose the connection and
   # reconnect then subscriptions will be renewed.
-  client.subscribe("ece180d/team4/testing", qos=1)
+  client.subscribe("ece180d/team4/channel1", qos=1)
 
 
 # The callback of the client when it disconnects.
@@ -22,8 +22,10 @@ def on_disconnect(client, userdata, rc):
 # The default message callback.
 # (you can create separate callbacks per subscribed topic)
 def on_message(client, userdata, message):
-  print('Received message: "' + str(message.payload) + '" on topic "' +
-        message.topic + '" with QoS ' + str(message.qos))
+  if message.topic == 'ece180d/team4/channel1': 
+    num = float(message.payload)
+    client.publish('ece180d/team4/channel2', num+1, qos=1)
+    print("sub: ", num)
 
 
 # 1. create a client instance.

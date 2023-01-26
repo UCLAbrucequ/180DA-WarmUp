@@ -9,7 +9,8 @@ def on_connect(client, userdata, flags, rc):
 
   # Subscribing in on_connect() means that if we lose the connection and
   # reconnect then subscriptions will be renewed.
-  client.subscribe("ece180d/team4/testing", qos=1)
+  client.subscribe("ece180d/team4/channel2", qos=1)
+
 
 
 # The callback of the client when it disconnects.
@@ -25,13 +26,11 @@ def on_disconnect(client, userdata, rc):
 def on_message(client, userdata, message):
   # print('Received message: "' + str(message.payload) + '" on topic "' +
   #       message.topic + '" with QoS ' + str(message.qos))
-  if message.topic == '/something': 
-    pass # do something. 
-  elif message.topic == 'something/else':
-    pass # do something.
-  i = float(message.payload)
-  print(i + 1)
-  client.publish('ece180d/team4/testing', i+1, qos=1)
+  if message.topic == 'ece180d/team4/channel2': 
+    num = float(message.payload)
+    client.publish('ece180d/team4/channel1', num+1, qos=1)
+    print("pub: ", num)
+  
 
 
 
@@ -57,7 +56,7 @@ client.loop_start()
 # payload must be a string, bytearray, int, float or None.
 print('Publishing...')
 for i in range(1):
-  client.publish("ece180d/team4/testing", float(np.random.random(1)), qos=1)
+  client.publish("ece180d/team4/channel1", 1, qos=1)
   # client.publish("ece180d/team4/p2", float(np.random.random(1)), qos=1)
   # client.publish("ece180d/team4/p3", float(np.random.random(1)), qos=1)
 
