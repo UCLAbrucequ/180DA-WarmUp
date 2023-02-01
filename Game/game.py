@@ -17,7 +17,12 @@ SCREEN_HEIGHT = Constants.SCREEN_HEIGHT
 
 pygame.init()
 
+# Create a new screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+# Caption and icon
+pygame.display.set_caption("Fruit Fight")
+
 
 player = Player()
 
