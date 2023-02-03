@@ -1,48 +1,77 @@
 import random
-import pygame
-import Constants
 
+class Rps:
+    choices = ("rock", "paper", "scissors")
+    inferior_choice_of = {"rock": "scissors", "paper": "rock", "scissors": "paper"}
 
+    def __init__(self, player1: "RpsPlayer", player2: "RpsPlayer") -> None:
+        self.player1 = player1
+        self.player2 = player2
 
-def play(input1, input2):
-    # while True:
-    user_action = input2
-    possible_actions = ["rock", "paper", "scissors"]
-    computer_action = input1
-    print(f"\nYou chose {user_action}, computer chose {computer_action}.\n")
+    def print_choices(self) -> None:
+        print(f"{self.player1.name} chose {self.player1.choice}")
+        print(f"{self.player2.name} chose {self.player2.choice}")
 
-    if user_action == computer_action:
-        print(f"Both players selected {user_action}. It's a tie!")
-    elif user_action == "rock":
-        if computer_action == "scissors":
-            print("Rock smashes scissors! You win!")
+    def get_winner(self):
+        if self.player2.choice == self.inferior_choice_of[self.player1.choice]:
+            return self.player1
+        elif self.player1.choice == self.inferior_choice_of[self.player2.choice]:
+            return self.player2
         else:
-            print("Paper covers rock! You lose.")
-    elif user_action == "paper":
-        if computer_action == "rock":
-            print("Paper covers rock! You win!")
-        else:
-            print("Scissors cuts paper! You lose.")
-    elif user_action == "scissors":
-        if computer_action == "paper":
-            print("Scissors cuts paper! You win!")
-        else:
-            print("Rock smashes scissors! You lose.")
+            return None
 
-        # play_again = input("Play again? (y/n): ")
-        # if play_again.lower() != "y":
-        #     break
+class RpsPlayer:
+    def __init__(self, name, choice) -> None:
+        self.name = name
+        self.choice = choice
+
+    @property
+    def choice(self):
+        return self._choice
+
+    @choice.setter
+    def choice(self, choice):
+        if choice not in Rps.choices:
+            raise ValueError("Invalid choice")
+        self._choice = choice
+
+    def get_new_choice(self):
+        while True:
+            try:
+                self.choice = input("Enter choice (rock|paper|scissors): ")
+            except ValueError:
+                continue
+            else:
+                break
+
+    @classmethod
+    def get(cls):
+        name = input("Enter your name: ")
+        player = cls(name, "rock") # initialize with temp choice
+        player.get_new_choice()
+
+        return player
 
 
-def display(user1, user2):
-    pygame.init()
-    screen = pygame.display.set_mode((1200, 800))
-    screen.fill((0, 0, 0))
+def main():
+    user = RpsPlayer.get()
     while True:
-        pygame.display.flip()  # do your non-blocked other stuff here, like receive IMU data or something.
+        bot = RpsPlayer("Bot", random.choice(Rps.choices)) # spawn bot
 
-        if Constants.show_rock:
-            pygame.draw.circle(screen, (0, 0, 255), (250, 250), 75)
+        #Instantiate game
+        rps = Rps(user, bot)
+        rps.print_choices()
 
-        
+        # Evaluate winner of game
+        winner = rps.get_winner()
+        if winner == None:
+            print("* Tie game *")
+        else:
+            print(f"* {winner.name} won! *")
 
+        print("")
+
+        user.get_new_choice()
+
+if __name__ == "__main__":
+  main()
