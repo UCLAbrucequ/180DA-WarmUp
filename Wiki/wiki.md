@@ -63,13 +63,13 @@ $$\hat{x} = (\lambda_1A_1^TA_1+...+\lambda_kA_k^TA_k)^{-1}(\lambda_1A_1^Tb_1+...
 
 Let's look at a simple linear (linear in parameters!) regression problem.
 
-We have data points ($x^{(1)}, y^{(1)}$), ($x^{(2)}, y^{(2)}$), ($x^{(3)}, y^{(3)}$), ..., ($x^{(N)}, y^{(N)}$) and model
+We have data points $(x^{(1)}, y^{(1)}), (x^{(2)}, y^{(2)}), (x^{(3)}, y^{(3)}), ..., (x^{(N)}, y^{(N)})$ and model
  $$\hat{f}(x)=\theta_1f_1(x)+...+\theta_pf_p(x)$$
 
 If $\hat{f}_k(x)$ is a high-order polynomial of x, then a large $\theta_k$ will amplify the perturbations in $x$. This will result in a large variance in $\hat{f}(x)$, hence an overfitted model. We will later see how this is useful in image deblurring.
 
 Now, our problem becomes two-fold: 
-1) We want to fit the model $\hat{f}(x)$ to data points ($x^{(1)}, y^{(1)}$), ($x^{(2)}, y^{(2)}$), ..., ($x^{(N)}, y^{(N)}$), i.e. minimize the difference between our prediction and ground-truth.
+1) We want to fit the model $\hat{f}(x)$ to data points $(x^{(1)}, y^{(1)}), (x^{(2)}, y^{(2)}), (x^{(3)}, y^{(3)}), ..., (x^{(N)}, y^{(N)})$, i.e. minimize the difference between our prediction and ground-truth.
 2) We want to keep $\theta_1, \theta_2, ..., \theta_p$ small to avoid over-fitting.
 
 We can easily formulate this problem into a multi-objective least squares problem.
