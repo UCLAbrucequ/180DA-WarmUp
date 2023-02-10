@@ -22,7 +22,7 @@ $$J_1 = ||A_1x-b_1||^2, J_2 = ||A_2x-b_2||^2, ..., J_n = ||A_nx-b_n||^2$$
 
 For example, a weighted least squares problem can be formulated with the above definitions.
 
-$$ \textnormal{minimize} \;\; J = \lambda_1||A_1x-b_1||^2 + ... + \lambda_n||A_nx-b_n||^2$$
+$$ \textnormal{minimize} \quad J = \lambda_1||A_1x-b_1||^2 + ... + \lambda_n||A_nx-b_n||^2$$
 
 Let's look at an example!
 
@@ -43,7 +43,7 @@ In general, the coefficients $\lambda_1, ..., \lambda_n$ are positive values, an
 Assuming all $\lambda$s are all positive, we can slightly rewrite the objective.
 
 $$ \begin{aligned}
-\textnormal{minimize} \;\; J &= \lVert\sqrt{\lambda_{1}}A_1x-\sqrt{\lambda_1}b_1 \rVert^2 + ... + \lVert\sqrt{\lambda_{n}}A_nx-\sqrt{\lambda_n}b_n \rVert^2\\
+\textnormal{minimize} \quad J &= \lVert\sqrt{\lambda_{1}}A_1x-\sqrt{\lambda_1}b_1 \rVert^2 + ... + \lVert\sqrt{\lambda_{n}}A_nx-\sqrt{\lambda_n}b_n \rVert^2\\
 &= \sum_{k=1}^{n} \lVert\sqrt{\lambda_{k}}A_kx-\sqrt{\lambda_k}b_k \rVert^2\\
 &= \lVert 
 \begin{bmatrix}
