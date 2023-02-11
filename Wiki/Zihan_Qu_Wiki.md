@@ -8,7 +8,7 @@ This is an introductory article designed to introduce readers with some basic pr
 * Multi-objective least squares
 * Regularized data fitting
 * An interesting Application
-
+* Conclusion
 
 ## Preliminaries
 
@@ -29,11 +29,7 @@ $$ \textnormal{minimize} \quad J = \lambda_1||A_1x-b_1||^2 + ... + \lambda_n||A_
 
 In general, the coefficients $\lambda_1, ..., \lambda_n$ are positive values, and they express the relative importance of different objectives. An extreme example is $\lambda_1 = 1, \lambda_{2}, ..., \lambda_{n} = 0$, which simplifies this problem to a single-objective least squares problem.
 
-*** 
-
-### Solution of weighted least squares
-
-Assuming all $\lambda$s are all positive, we can slightly rewrite the objective.
+**Solution**. Assuming all $\lambda$s are all positive, we can slightly rewrite the objective.
 
 $$ \begin{aligned}
 \textnormal{minimize} \quad J &= \lVert\sqrt{\lambda_{1}}A_1x-\sqrt{\lambda_1}b_1 \rVert^2 + ... + \lVert\sqrt{\lambda_{n}}A_nx-\sqrt{\lambda_n}b_n \rVert^2\\
@@ -66,8 +62,6 @@ $$\hat{x} = (\lambda_1A_1^TA_1+...+\lambda_kA_k^TA_k)^{-1}(\lambda_1A_1^Tb_1+...
  $$\hat{f}(x)=\theta_1f_1(x)+...+\theta_pf_p(x)$$
 
 If $\hat{f}_k(x)$ is a high-order polynomial of x, then a large $\theta_k$ will amplify the perturbations in $x$. This will result in a large variance in $\hat{f}(x)$, hence an overfitted model. We will later see how this is useful in image deblurring.
-
-***
 
 **Problem**. Now, our problem becomes two-fold: 
 1) We want to fit the model $\hat{f}(x)$ to data points $(x^{(1)}, y^{(1)}), (x^{(2)}, y^{(2)}), (x^{(3)}, y^{(3)}), ..., (x^{(N)}, y^{(N)})$, i.e. minimize the difference between our prediction and ground-truth.
@@ -111,17 +105,16 @@ A_2 =
 \end{bmatrix}
 $$
 
-***
 
 **Solution**. Similar to the previous multi-objective least squares problem:
 
 $$\hat{x} = (A_1^TA_1 + \lambda A_2^TA_2)^{-1}(A_1^Ty^d)$$
 
+***
+
 ## An interesting application
 
 In this part, we will briefly discuss how we can treat some problems in real life as multi-objective least squares problems.
-
-***
 
 An interesting application of estimation (or multi-objective least squares problem) is image deblurring/denoising. 
 
@@ -176,6 +169,10 @@ end
 
 **Analysis**. In the above code, we used Fast Fourier Transform and Inverse Fast Fourier Transform to help us deblur the image. This is out of the scope of this wiki. We notice that when $\lambda = 10^{-6}$, the deblurred image looks like a mosaic image. It's similar to "overfitting" in regression problems as this cost function disregards the variance of pixel differences. On the other hand, when $\lambda = 1$, the cost function penalizes any abrupt changes in neighboring pixel values, resulting in a "smoothed" image.
 
+***
+
+## Conclusion
+In the wiki blog, we defined the multi-objective least squares problem, derived the solution, and introduced the regularization term. At the very end, we treated the image deblurring task as a multi-objective least sqaures problem.
 
 ## Reference
 
