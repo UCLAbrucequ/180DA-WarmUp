@@ -7,7 +7,7 @@ This is an introductory article designed to introduce readers with some basic pr
 * Preliminaries
 * Multi-objective least squares
 * Regularized data fitting
-* Estimation
+* An interesting Application
 
 
 ## Preliminaries
@@ -117,7 +117,7 @@ $$
 
 $$\hat{x} = (A_1^TA_1 + \lambda A_2^TA_2)^{-1}(A_1^Ty^d)$$
 
-## Estimation
+## An interesting application
 
 In this part, we will briefly discuss how we can treat some problems in real life as multi-objective least squares problems.
 
@@ -153,7 +153,7 @@ $$\textnormal{minimize} \quad J_1 + J_2 = \lVert Ax - y \rVert^2 + \lambda(\lVer
 
 $$\textnormal{where} \quad \lVert D_vx\rVert^2 + \lVert D_hx \rVert^2 = \sum_{i=1}^{M}\sum_{j=1}^{N-1}(X_{i, j+1}-X_{i,j})^2+\sum_{i=1}^{M-1}\sum_{j=1}^{N}(X_{i+1, j}-X_{i,j})^2$$
 
-An intuition for term $\lVert D_vx\rVert^2 + \lVert D_hx \rVert^2$ is that it represent the sum of squared differences between values at neighboring (both vertical and horizontal) pixels. If this term is small, then it means that the neighboring pixels transition smoothly. If this term is large, then $\hat{x}$ would look like an mosaic image.
+**Intuition**. The term $\lVert D_vx\rVert^2 + \lVert D_hx \rVert^2$ represents the sum of squared differences between values at neighboring (both vertical and horizontal) pixels. If this term is small, then it means that the neighboring pixels transition smoothly. If this term is large, then $\hat{x}$ would look like an mosaic image.
 
 ```Matlab
 % MATLAB script (cont.)
@@ -168,14 +168,19 @@ for i=-6:2:0
   title(str);
 end
 ```
-<figure>
-    <img src="../Images/nonblurry_image.png">
+<p align="center">
+    <img src="../Images/nonblurry_image.png" 
+    width="80%" height="80%">
     <figcaption> Fig.2 Deblurred images </figcaption>
-</figure>
+</p>
 
-
-
+**Analysis**. In the above code, we used Fast Fourier Transform and Inverse Fast Fourier Transform to help us deblur the image. This is out of the scope of this wiki. We notice that when $\lambda = 10^{-6}$, the deblurred image looks like a mosaic image. It's similar to "overfitting" in regression problems as this cost function disregards the variance of pixel differences. On the other hand, when $\lambda = 1$, the cost function penalizes any abrupt changes in neighboring pixel values, resulting in a "smoothed" image.
 
 
 ## Reference
 
+Boyd, S., &amp; Vandenberghe, L. (2019). Chapter15: Multi-objective Least Squares. In Introduction to applied linear algebra: Vectors, matrices, and least squares (pp. 309–325). essay, Cambridge University Press. 
+
+Unclear, U. (n.d.). Volume1: Mosaics. Sipi Image Database. Retrieved February 10, 2023, from http://sipi.usc.edu/database 
+
+Johari, A. (2020, May 13). A 101 guide on the least squares regression method. Medium. Retrieved February 10, 2023, from https://medium.com/edureka/least-square-regression-40b59cca8ea7 
