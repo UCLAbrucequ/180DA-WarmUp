@@ -148,9 +148,9 @@ imshow(Y);
 
 We will introduce the cost function/objective:
 
-$$\textnormal{minimize} \quad J_1 + J_2 = \lVert Ax - y \rVert^2 + \lambda(\lVert D_vx\rVert^2 + \lVert D_hx \rVert^2) \\
+$$\textnormal{minimize} \quad J_1 + J_2 = \lVert Ax - y \rVert^2 + \lambda(\lVert D_vx\rVert^2 + \lVert D_hx \rVert^2) $$
 
-\textnormal{where} \quad \lVert D_vx\rVert^2 + \lVert D_hx \rVert^2 = \sum_{i=1}^{M}\sum_{j=1}^{N-1}(X_{i, j+1}-X_{i,j})^2+\sum_{i=1}^{M-1}\sum_{j=1}^{N}(X_{i+1, j}-X_{i,j})^2$$
+$$\textnormal{where} \quad \lVert D_vx\rVert^2 + \lVert D_hx \rVert^2 = \sum_{i=1}^{M}\sum_{j=1}^{N-1}(X_{i, j+1}-X_{i,j})^2+\sum_{i=1}^{M-1}\sum_{j=1}^{N}(X_{i+1, j}-X_{i,j})^2$$
 
 An intuition for term $\lVert D_vx\rVert^2 + \lVert D_hx \rVert^2$ is that it represent the sum of squared differences between values at neighboring (both vertical and horizontal) pixels. If this term is small, then it means that the neighboring pixels transition smoothly. If this term is large, then $\hat{x}$ would look like an mosaic image.
 
