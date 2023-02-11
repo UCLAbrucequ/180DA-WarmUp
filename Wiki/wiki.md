@@ -137,10 +137,11 @@ Y = read(f, "Y");
 B = read(f, "B");
 imshow(Y);
 ```
-<figure>
-    <img src="../Images/blurry_image.png">
+<p align="center">
+    <img src="../Images/blurry_image.png"
+    width="50%" height="50%">
     <figcaption> Fig.1 blurry image Y</figcaption>
-</figure>
+</p>
 
 **Problem**. In this image deblurring problem, we are given a noisy and blurred image $Y$, which comes from a clear yet unknown image $x_{ex}$. We can model this transformation as $Y = Ax_{ex} + n$, where $A$ is a known blurring matrix and $n$ is unknown noise. 
 
