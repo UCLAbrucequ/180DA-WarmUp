@@ -12,7 +12,10 @@ This is an introductory article designed to introduce readers with some basic pr
 
 ## Preliminaries
 
-Before we start, we will quickly review some fundamental concepts that we need later on.
+Before we start, you need to review some fundamental concepts that we will use later on.
+
+* Basic Linear Algebra
+* Least Squares
 
 ## Multi-objective least squares
 
@@ -39,15 +42,13 @@ $$ \begin{aligned}
 \begin{bmatrix}
 \sqrt{\lambda_{1}}A_1 \\
 \sqrt{\lambda_{2}}A_2 \\
-:\\
-:\\
+\vdots\\
 \sqrt{\lambda_{n}}A_n
 \end{bmatrix} x - 
 \begin{bmatrix}
 \sqrt{\lambda_{1}}b_1 \\
 \sqrt{\lambda_{2}}b_2 \\
-:\\
-:\\
+\vdots\\
 \sqrt{\lambda_{n}}b_n
 \end{bmatrix} \rVert^2
 \end{aligned}
@@ -76,7 +77,7 @@ If $\hat{f}_k(x)$ is a high-order polynomial of x, then a large $\theta_k$ will 
 
 $$J_1(\theta) = \sum_{k=1}^{N}(\hat{f}(x^{(k)}) - y^{(k)})^2,\quad J_2(\theta) = \sum_{j=1}^{p}\theta_j^2$$
 
-Depending on the strength of regularization, we can toggle the value of a regularization coefficient $\lambda$. That is,
+Depending on the strength of regularization, we can increase/decrease the value of a regularization coefficient $\lambda$. That is,
 
 $$ \begin{aligned}
 \textnormal{minimize} \quad J_1(\theta) + \lambda J_2(\theta) &= \sum_{k=1}^{N}(\hat{f}(x^{(k)}) - y^{(k)})^2 + \lambda \sum_{j=1}^{p}\theta_j^2 \\
@@ -96,61 +97,84 @@ $$
 $$\textnormal{with} \quad y^d = (y^{(1)}, ..., y^{(N)}), \quad
 A_1 = 
 \begin{bmatrix}
-1 & f_2(x^{(1)}) & ... & f_p(x^{(1)}) \\
-1 & f_2(x^{(2)}) & ... & f_p(x^{(2)}) \\
-: & : & ... & : \\
-1 & f_2(x^{(N)}) & ... & f_p(x^{(N)}) \\
+1 & f_2(x^{(1)}) & \cdots & f_p(x^{(1)}) \\
+1 & f_2(x^{(2)}) & \cdots & f_p(x^{(2)}) \\
+\vdots & \vdots & \ddots & \vdots \\
+1 & f_2(x^{(N)}) & \cdots & f_p(x^{(N)}) \\
 \end{bmatrix}, \quad
 A_2 = 
 \begin{bmatrix}
-1 & f_2(x^{(1)}) & ... & f_p(x^{(1)}) \\
-1 & f_2(x^{(2)}) & ... & f_p(x^{(2)}) \\
-: & : & ... & : \\
-1 & f_2(x^{(N)}) & ... & f_p(x^{(N)}) \\
+0 & 1 & 0 & \cdots & 0 \\
+0 & 0 & 1 & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & 0 & \cdots & 1 \\
 \end{bmatrix}
 $$
 
 ***
 
-**Solution**.
+**Solution**. Similar to the previous multi-objective least squares problem:
 
+$$\hat{x} = (A_1^TA_1 + \lambda A_2^TA_2)^{-1}(A_1^Ty^d)$$
+
+## Estimation
+
+In this part, we will briefly discuss how we can treat some problems in real life as multi-objective least squares problems.
+
+***
+
+An interesting application of estimation (or multi-objective least squares problem) is image deblurring/denoising. 
+
+Let $x_{ex}$ be an unknown image and y be an observed image.
+
+In the MATLAB code below, we load in an image from the USC-SIPI Image Database at <http://sipi.usc.edu/database>.
+
+```Matlab
+% MATLAB script
+using MAT, ImageView
+f = matopen("deblur.mat");
+Y = read(f, "Y");
+B = read(f, "B");
+imshow(Y);
+```
 <figure>
-    <img src="../Images/projection.png"
-         alt="Elephant at sunset">
-    <figcaption> Fig.1 Projection</figcaption>
+    <img src="../Images/blurry_image.png">
+    <figcaption> Fig.1 blurry image Y</figcaption>
 </figure>
 
-Projection of $\vec{x}$ onto $\vec{u}$ (green vector in fig.1)?
+**Problem**. In this image deblurring problem, we are given a noisy and blurred image $Y$, which comes from a clear yet unknown image $x_{ex}$. We can model this transformation as $Y = Ax_{ex} + n$, where $A$ is a known blurring matrix and $n$ is unknown noise. 
 
-$$ \begin{aligned}
-\lVert \vec{x} \rVert \cos\theta &= \frac{\lVert \vec{x} \rVert \lVert \vec{u} \rVert \cos\theta} {\lVert \vec{u} \rVert} \\
-&= \frac{\vec{x}^\intercal \vec{u}}{\lVert \vec{u} \rVert}
-\end{aligned}
-$$
+**Method**. We will try to construct $\hat{x}$ so that 1) we can get a denoised image, and 2) the image doesn't seem blurry.
 
+We will introduce the cost function/objective:
 
-### Heading 3
+$$\textnormal{minimize} \quad J_1 + J_2 = \lVert Ax - y \rVert^2 + \lambda(\lVert D_vx\rVert^2 + \lVert D_hx \rVert^2) \\
 
-$A \cup B$
+\textnormal{where} \quad \lVert D_vx\rVert^2 + \lVert D_hx \rVert^2 = \sum_{i=1}^{M}\sum_{j=1}^{N-1}(X_{i, j+1}-X_{i,j})^2+\sum_{i=1}^{M-1}\sum_{j=1}^{N}(X_{i+1, j}-X_{i,j})^2$$
 
-<p align="center">
-<img src="https://www.raspberrypi.org/app/uploads/2018/03/RPi-Logo-Reg-SCREEN-199x250.png" alt="Raspberry pi" style="width:20%; border:0;">
-</p>
+An intuition for term $\lVert D_vx\rVert^2 + \lVert D_hx \rVert^2$ is that it represent the sum of squared differences between values at neighboring (both vertical and horizontal) pixels. If this term is small, then it means that the neighboring pixels transition smoothly. If this term is large, then $\hat{x}$ would look like an mosaic image.
 
+```Matlab
+% MATLAB script (cont.)
+E = [1, zeros(1, 1023); zeros(1022, 1024); -1, zeros(1, 1023)];
+D = @(lambda) abs(fft2(B)).^2 + lambda.*abs(fft2(E)).^2 + lambda.*abs(fft2(E')).^2;
 
-$$
-\begin{bmatrix}
-1 & 2 & 3 \\
-4 & 5 & 6 \\
-a & b & c
-\end{bmatrix}
-$$
-
-
-
-```r
-norm = function(x) {
-  sqrt(x%*%x)
-}
-norm(1:4)
+for i=-6:2:0
+  X = ifft2((conj(fft2(B)).*fft2(Y))./D(10.^i));
+  figure();
+  imshow(X);
+  str = sprinf('lambda=%d',i);
+  title(str);
+end
 ```
+<figure>
+    <img src="../Images/nonblurry_image.png">
+    <figcaption> Fig.2 Deblurred images </figcaption>
+</figure>
+
+
+
+
+
+## Reference
+
