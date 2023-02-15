@@ -1,23 +1,14 @@
-/****************************************************************
- * Example2_Advanced.ino
- * ICM 20948 Arduino Library Demo
- * Shows how to use granular configuration of the ICM 20948
- * Owen Lyke @ SparkFun Electronics
- * Original Creation Date: April 17 2019
- *
- * Please see License.md for the license information.
- *
- * Distributed as-is; no warranty is given.
- ***************************************************************/
+#include <WiFi.h>
+#include <PubSubClient.h>
+#include "arduino_secrets.h"
 #include "ICM_20948.h" // Click here to get the library: http://librarymanager/All#SparkFun_ICM_20948_IMU
 
 //#define USE_SPI       // Uncomment this to use SPI
 
 #define SERIAL_PORT Serial
 
-#define SPI_PORT SPI     // Your desired SPI port.       Used only when "USE_SPI" is defined
-#define SPI_FREQ 5000000 // You can override the default SPI frequency
-#define CS_PIN 2         // Which pin you connect CS to. Used only when "USE_SPI" is defined
+#define SPI_PORT SPI // Your desired SPI port.       Used only when "USE_SPI" is defined
+#define CS_PIN 2     // Which pin you connect CS to. Used only when "USE_SPI" is defined
 
 #define WIRE_PORT Wire // Your desired Wire port.      Used when "USE_SPI" is not defined
 // The value of the last bit of the I2C address.
@@ -30,143 +21,91 @@ ICM_20948_SPI myICM; // If using SPI create an ICM_20948_SPI object
 ICM_20948_I2C myICM; // Otherwise create an ICM_20948_I2C object
 #endif
 
-void setup()
-{
+// WiFi
+const char *ssid = SECRET_SSID; // Enter your WiFi name
+const char *password = SECRET_PASS;  // Enter WiFi password
 
-  SERIAL_PORT.begin(115200);
-  while (!SERIAL_PORT)
-  {
-  };
+// MQTT Broker
+// const char *mqtt_broker = "broker.emqx.io";
+// const char *topic = "ece180d/test";
+// const char *mqtt_username = "emqx";
+// const char *mqtt_password = "public";
+// const int mqtt_port = 1883;
 
-#ifdef USE_SPI
-  SPI_PORT.begin();
-#else
-  WIRE_PORT.begin();
-  WIRE_PORT.setClock(400000);
-#endif
+// MQTT Broker
+const char *mqtt_broker = "mqtt.eclipseprojects.io";
+const char *topic = "brucequ/home";
+// const char *mqtt_username = "emqx";
+// const char *mqtt_password = "public";
+const int mqtt_port = 1883;
 
-  //myICM.enableDebugging(); // Uncomment this line to enable helpful debug messages on Serial
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void setup() {
+ // Set software serial baud to 115200;
+ Serial.begin(115200);
+ // connecting to a WiFi network
+ WiFi.begin(ssid, password);
+ while (WiFi.status() != WL_CONNECTED) {
+     delay(500);
+     Serial.println("Connecting to WiFi..");
+ }
+ Serial.println("Connected to the WiFi network");
+ //connecting to a mqtt broker
+ client.setServer(mqtt_broker, mqtt_port);
+ client.setCallback(callback);
+ while (!client.connected()) {
+     String client_id = "esp32-client-";
+     client_id += String(WiFi.macAddress());
+     Serial.printf("The client %s connects to the public mqtt broker\n", client_id.c_str());
+     if (client.connect(client_id.c_str())) { //, mqtt_username, mqtt_password)) {
+         Serial.println("mqtt broker connected");
+     } else {
+         Serial.print("failed with state ");
+         Serial.print(client.state());
+         delay(2000);
+     }
+ }
+ // publish and subscribe
+ client.publish(topic, "Hi I'm ESP32 ^^");
+ client.subscribe(topic);
+
+  #ifdef USE_SPI
+    SPI_PORT.begin();
+  #else
+    WIRE_PORT.begin();
+    WIRE_PORT.setClock(400000);
+  #endif
 
   bool initialized = false;
-  while (!initialized)
-  {
-
-#ifdef USE_SPI
-    myICM.begin(CS_PIN, SPI_PORT, SPI_FREQ); // Here we are using the user-defined SPI_FREQ as the clock speed of the SPI bus
-#else
-    myICM.begin(WIRE_PORT, AD0_VAL);
-#endif
+  while (!initialized) {
+    #ifdef USE_SPI
+      myICM.begin(CS_PIN, SPI_PORT);
+    #else
+      myICM.begin(WIRE_PORT, AD0_VAL);
+    #endif
 
     SERIAL_PORT.print(F("Initialization of the sensor returned: "));
     SERIAL_PORT.println(myICM.statusString());
-    if (myICM.status != ICM_20948_Stat_Ok)
-    {
+    if (myICM.status != ICM_20948_Stat_Ok) {
       SERIAL_PORT.println("Trying again...");
       delay(500);
-    }
-    else
-    {
+    } else {
       initialized = true;
     }
   }
+}
 
-  // In this advanced example we'll cover how to do a more fine-grained setup of your sensor
-  SERIAL_PORT.println("Device connected!");
-
-  // Here we are doing a SW reset to make sure the device starts in a known state
-  myICM.swReset();
-  if (myICM.status != ICM_20948_Stat_Ok)
-  {
-    SERIAL_PORT.print(F("Software Reset returned: "));
-    SERIAL_PORT.println(myICM.statusString());
+void callback(char *topic, byte *payload, unsigned int length) {
+  Serial.print("Message arrived in topic: ");
+  Serial.println(topic);
+  Serial.print("Message:");
+  for (int i = 0; i < length; i++) {
+    Serial.print((char) payload[i]);
   }
-  delay(250);
-
-  // Now wake the sensor up
-  myICM.sleep(false);
-  myICM.lowPower(false);
-
-  // The next few configuration functions accept a bit-mask of sensors for which the settings should be applied.
-
-  // Set Gyro and Accelerometer to a particular sample mode
-  // options: ICM_20948_Sample_Mode_Continuous
-  //          ICM_20948_Sample_Mode_Cycled
-  myICM.setSampleMode((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), ICM_20948_Sample_Mode_Continuous);
-  if (myICM.status != ICM_20948_Stat_Ok)
-  {
-    SERIAL_PORT.print(F("setSampleMode returned: "));
-    SERIAL_PORT.println(myICM.statusString());
-  }
-  
-  // Set full scale ranges for both acc and gyr
-  ICM_20948_fss_t myFSS; // This uses a "Full Scale Settings" structure that can contain values for all configurable sensors
-
-  myFSS.a = gpm2; // (ICM_20948_ACCEL_CONFIG_FS_SEL_e)
-                  // gpm2
-                  // gpm4
-                  // gpm8
-                  // gpm16
-
-  myFSS.g = dps250; // (ICM_20948_GYRO_CONFIG_1_FS_SEL_e)
-                    // dps250
-                    // dps500
-                    // dps1000
-                    // dps2000
-
-  myICM.setFullScale((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), myFSS);
-  if (myICM.status != ICM_20948_Stat_Ok)
-  {
-    SERIAL_PORT.print(F("setFullScale returned: "));
-    SERIAL_PORT.println(myICM.statusString());
-  }
-
-  // Set up Digital Low-Pass Filter configuration
-  ICM_20948_dlpcfg_t myDLPcfg;    // Similar to FSS, this uses a configuration structure for the desired sensors
-  myDLPcfg.a = acc_d473bw_n499bw; // (ICM_20948_ACCEL_CONFIG_DLPCFG_e)
-                                  // acc_d246bw_n265bw      - means 3db bandwidth is 246 hz and nyquist bandwidth is 265 hz
-                                  // acc_d111bw4_n136bw
-                                  // acc_d50bw4_n68bw8
-                                  // acc_d23bw9_n34bw4
-                                  // acc_d11bw5_n17bw
-                                  // acc_d5bw7_n8bw3        - means 3 db bandwidth is 5.7 hz and nyquist bandwidth is 8.3 hz
-                                  // acc_d473bw_n499bw
-
-  myDLPcfg.g = gyr_d361bw4_n376bw5; // (ICM_20948_GYRO_CONFIG_1_DLPCFG_e)
-                                    // gyr_d196bw6_n229bw8
-                                    // gyr_d151bw8_n187bw6
-                                    // gyr_d119bw5_n154bw3
-                                    // gyr_d51bw2_n73bw3
-                                    // gyr_d23bw9_n35bw9
-                                    // gyr_d11bw6_n17bw8
-                                    // gyr_d5bw7_n8bw9
-                                    // gyr_d361bw4_n376bw5
-
-  myICM.setDLPFcfg((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), myDLPcfg);
-  if (myICM.status != ICM_20948_Stat_Ok)
-  {
-    SERIAL_PORT.print(F("setDLPcfg returned: "));
-    SERIAL_PORT.println(myICM.statusString());
-  }
-
-  // Choose whether or not to use DLPF
-  // Here we're also showing another way to access the status values, and that it is OK to supply individual sensor masks to these functions
-  ICM_20948_Status_e accDLPEnableStat = myICM.enableDLPF(ICM_20948_Internal_Acc, false);
-  ICM_20948_Status_e gyrDLPEnableStat = myICM.enableDLPF(ICM_20948_Internal_Gyr, false);
-  SERIAL_PORT.print(F("Enable DLPF for Accelerometer returned: "));
-  SERIAL_PORT.println(myICM.statusString(accDLPEnableStat));
-  SERIAL_PORT.print(F("Enable DLPF for Gyroscope returned: "));
-  SERIAL_PORT.println(myICM.statusString(gyrDLPEnableStat));
-
-  // Choose whether or not to start the magnetometer
-  myICM.startupMagnetometer();
-  if (myICM.status != ICM_20948_Stat_Ok)
-  {
-    SERIAL_PORT.print(F("startupMagnetometer returned: "));
-    SERIAL_PORT.println(myICM.statusString());
-  }
-
-  SERIAL_PORT.println();
-  SERIAL_PORT.println(F("Configuration complete!"));
+  Serial.println();
+  Serial.println("-----------------------");
 }
 
 void loop()
@@ -174,14 +113,17 @@ void loop()
 
   if (myICM.dataReady())
   {
-    myICM.getAGMT();              // The values are only updated when you call 'getAGMT'
-    //printRawAGMT( myICM.agmt ); // Uncomment this to see the raw values, taken directly from the agmt structure
-    printScaledAGMT(&myICM);      // This function takes into account the scale settings from when the measurement was made to calculate the values with units
+    myICM.getAGMT();         // The values are only updated when you call 'getAGMT'
+                             //    printRawAGMT( myICM.agmt );     // Uncomment this to see the raw values, taken directly from the agmt structure
+    printScaledAGMT(&myICM); // This function takes into account the scale settings from when the measurement was made to calculate the values with units
+    // client.publish(topic, myICM->acc.axes.x);
+    client.loop();
     delay(30);
   }
   else
   {
     SERIAL_PORT.println("Waiting for data");
+    client.loop();
     delay(500);
   }
 }
@@ -309,6 +251,9 @@ void printScaledAGMT(ICM_20948_I2C *sensor)
 #endif
   SERIAL_PORT.print("Scaled. Acc (mg) [ ");
   printFormattedFloat(sensor->accX(), 5, 2);
+  char buf[10];
+  snprintf(buf, 10, "%f", sensor->accX());  
+  //client.publish(topic, buf);
   SERIAL_PORT.print(", ");
   printFormattedFloat(sensor->accY(), 5, 2);
   SERIAL_PORT.print(", ");
@@ -329,4 +274,14 @@ void printScaledAGMT(ICM_20948_I2C *sensor)
   printFormattedFloat(sensor->temp(), 5, 2);
   SERIAL_PORT.print(" ]");
   SERIAL_PORT.println();
-}
+
+  if (sensor->accX() > 0.01){
+    \\ moving forward
+    
+  } else if (sensor->accX() < -0.01){
+    \\ moving backward
+
+  }
+  
+ 
+ }
