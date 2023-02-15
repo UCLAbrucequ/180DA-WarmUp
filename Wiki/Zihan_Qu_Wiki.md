@@ -130,11 +130,13 @@ Y = read(f, "Y");
 B = read(f, "B");
 imshow(Y);
 ```
-<p align="center">
-    <img src="../Images/blurry_image.png"
-    width="50%" height="50%">
-    <figcaption> Fig.1 blurry image Y</figcaption>
-</p>
+
+
+<div style="align: center; text-align:center;">
+    <img src="../Images/blurry_image.png" height="50%" width="50%" />
+    <div class="caption">Fig.1 blurry image Y</div>
+</div>
+
 
 **Problem**. In this image deblurring problem, we are given a noisy and blurred image $Y$, which comes from a clear yet unknown image $x_{ex}$. We can model this transformation as $Y = Ax_{ex} + n$, where $A$ is a known blurring matrix and $n$ is unknown noise. 
 
@@ -161,11 +163,11 @@ for i=-6:2:0
   title(str);
 end
 ```
-<p align="center">
-    <img src="../Images/nonblurry_image.png" 
-    width="80%" height="80%">
-    <figcaption> Fig.2 Deblurred images </figcaption>
-</p>
+
+<div style="align: center; text-align:center;">
+    <img src="../Images/nonblurry_image.png" height="70%" width="70%" />
+    <div class="caption"> Fig.2 Deblurred images </div>
+</div>
 
 **Analysis**. In the above code, we used Fast Fourier Transform and Inverse Fast Fourier Transform to help us deblur the image. This is out of the scope of this wiki. We notice that when $\lambda = 10^{-6}$, the deblurred image looks like a mosaic image. It's similar to "overfitting" in regression problems as this cost function disregards the variance of pixel differences. On the other hand, when $\lambda = 1$, the cost function penalizes any abrupt changes in neighboring pixel values, resulting in a "smoothed" image.
 
